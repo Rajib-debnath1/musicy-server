@@ -34,12 +34,12 @@ async function run() {
 
       const usersCollections = client.db("musicyDB").collection("users");
 
-
+// addUsers from firebase
       app.post("/addUsers", async(req, res)=>{
         const data = req.body;
         console.log(data,"data");
         const getUser = await usersCollections.findOne({email: data.email})
-        if(!getUser.email){
+        if(!getUser?.email){
             const result = await usersCollections.insertOne(data)
         if(result){
             res.send(result)
@@ -52,6 +52,70 @@ async function run() {
        
       })
 
+
+      app.get('/allUsers', async(req, res) =>{
+        const query = {} 
+        const result = await usersCollections.find(query).toArray();
+        res.send(result)
+      })
+
+      
+
+
+      app.put('/changeRole', async(req, res) =>{
+        const {id, role: newRole} = req.body
+
+        const filter = {_id: new ObjectId(id)}
+
+        // const filter2={email:req.body.email}
+
+        const updaterDoc = {
+            $set: {
+                role: newRole
+            }
+        }
+        
+        console.log(filter, 'data');
+        const result = await usersCollections.updateOne(filter,updaterDoc);
+        console.log(result);
+        res.send(result)
+      })
+
+      app.get('/checkRole/:email', async(req, res) =>{
+        const query = {email: req.params.email} 
+        console.log(query,"query");
+        if(req.params.email){
+            const getUser = await usersCollections.findOne(query);
+            
+            res.status(200).json(getUser)
+
+        }
+
+   
+      })
+
+    // app.get('/checkRole/:email', async (req, res) => {
+    //     if (req.params?.email) {
+    //       const query = { email: req.params.email };
+    //       console.log(query);
+      
+    //       try {
+    //         const result = await usersCollections.findOne(query);
+    //         console.log(result);
+      
+    //         if (result && result.email) {
+    //           res.send({ role: result.role });
+    //         } else {
+    //           res.status(404).send({ error: 'User not found' });
+    //         }
+    //       } catch (error) {
+    //         console.error(error);
+    //         res.status(500).send({ error: 'Internal Server Error' });
+    //       }
+    //     } else {
+    //       res.status(400).send({ error: 'Invalid email parameter' });
+    //     }
+    //   });
 
     } finally {
       // Ensures that the client will close when you finish/error
