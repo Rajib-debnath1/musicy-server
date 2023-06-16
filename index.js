@@ -28,8 +28,7 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+   
 
 
     const usersCollections = client.db("musicyDB").collection("users");
@@ -142,9 +141,11 @@ async function run() {
       console.log(query, "query in myClass");
 
       if (req.params.email) {
-        const getUser = await selectedCollections.find(query).toArray();
-        res.status(200).json(getUser)
+        const getClass = await selectedCollections.find(query).toArray();
+        res.status(200).json(getClass)
+
       }
+
 
 
     })
@@ -178,8 +179,29 @@ app.get('/allinstructor', async (req, res) => {
 
 })
 
-    a
+app.get('/instructorclass/:email', async (req, res) => {
+  const query = {
+    email: req.params.email
+  }
 
+  console.log(query, "query in myClass");
+
+  if (req.params.email) {
+    const getClass = await classesCollections.find(query).toArray();
+    res.status(200).json(getClass)
+    
+    // console.log(getClass);
+  }
+
+
+
+
+})
+
+  
+await client.db("admin").command({ ping: 1 });
+
+console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
   } finally {
     // Ensures that the client will close when you finish/error
