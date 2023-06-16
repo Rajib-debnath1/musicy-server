@@ -194,9 +194,40 @@ app.get('/instructorclass/:email', async (req, res) => {
   }
 
 
+})
 
+
+app.put('/updateClass',async(req,res)=>{
+  const data =req?.body
+  const filter ={name:data.name}
+  const updaterDoc={
+    $set:{
+      name:data.name,
+      img:data.img,
+      seats:data.seats,
+      price:data.price
+    }
+  }
+  // console.log(updaterDoc,"update");
+
+  const result =await classesCollections.updateOne(filter,updaterDoc)
+    res.send(updaterDoc)
+    console.log(result);
 
 })
+
+
+
+app.get('/manageClasss', async (req, res) => {
+  const query =  {}
+
+  console.log(query, "query in myClass");
+
+  const getUser = await classesCollections.find(query).toArray();
+  res.status(200).json(getUser)
+
+  }
+  )
 
   
 await client.db("admin").command({ ping: 1 });
