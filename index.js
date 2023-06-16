@@ -7,6 +7,7 @@ const port = process.env.PORT || 5000;
 const colors = require("colors")
 
 
+
 // middleware
 app.use(cors());
 app.use(express.json());
@@ -192,8 +193,6 @@ app.get('/instructorclass/:email', async (req, res) => {
     
     // console.log(getClass);
   }
-
-
 })
 
 
@@ -234,7 +233,7 @@ app.get('/manageClasss', async (req, res) => {
 app.put('/updateManageClass',async(req,res)=>{
   const data =req?.body
 
-  // console.log(data,"manage")
+  
 
   const filter ={name:data.name}
 
@@ -283,11 +282,10 @@ console.log("Pinged your deployment. You successfully connected to MongoDB!");
 run().catch(console.dir);
 
 
-
 app.get('/', (req, res) => {
-  res.send(' Musicy is running')
+  res.send('Musiqy is running')
 })
 
 app.listen(port, () => {
-  console.log(`Musicy Server is running on port ${port}`.red.underline.bold)
+  console.log(`Musiqy is sitting on port ${port}`);
 })
