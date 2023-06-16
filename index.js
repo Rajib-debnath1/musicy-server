@@ -33,6 +33,7 @@ async function run() {
 
 
       const usersCollections = client.db("musicyDB").collection("users");
+      const classesCollections = client.db("musicyDB").collection("classes");
 
 // addUsers from firebase
       app.post("/addUsers", async(req, res)=>{
@@ -94,28 +95,24 @@ async function run() {
    
       })
 
-    // app.get('/checkRole/:email', async (req, res) => {
-    //     if (req.params?.email) {
-    //       const query = { email: req.params.email };
-    //       console.log(query);
-      
-    //       try {
-    //         const result = await usersCollections.findOne(query);
-    //         console.log(result);
-      
-    //         if (result && result.email) {
-    //           res.send({ role: result.role });
-    //         } else {
-    //           res.status(404).send({ error: 'User not found' });
-    //         }
-    //       } catch (error) {
-    //         console.error(error);
-    //         res.status(500).send({ error: 'Internal Server Error' });
-    //       }
-    //     } else {
-    //       res.status(400).send({ error: 'Invalid email parameter' });
-    //     }
-    //   });
+
+      app.post("/addClasses", async(req, res)=>{
+        const data = req.body;
+        console.log(data,"data");
+
+       
+            const result = await classesCollections.insertOne(data)
+        
+            res.send(result)
+        
+        console.log(result,'success'); 
+        
+        
+       
+      })
+
+
+    
 
     } finally {
       // Ensures that the client will close when you finish/error
