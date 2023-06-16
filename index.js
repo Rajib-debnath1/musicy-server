@@ -230,6 +230,47 @@ app.get('/manageClasss', async (req, res) => {
   )
 
   
+
+app.put('/updateManageClass',async(req,res)=>{
+  const data =req?.body
+
+  // console.log(data,"manage")
+
+  const filter ={name:data.name}
+
+  const updaterDoc={
+    $set:{
+      status:data.status
+    }
+  }
+  console.log(updaterDoc,"update",filter);
+
+  const result =await classesCollections.updateOne(filter,updaterDoc)
+    res.send(result)
+    console.log(result);
+
+})
+
+
+app.put('/feedback',async(req,res)=>{
+  const data =req?.body
+
+  // console.log(data,"manage")
+
+  const filter ={name:data.name}
+
+  const updaterDoc={
+    $set:{
+      feedback:data.feedback
+    }
+  }
+  // console.log(updaterDoc,"update",filter,data);
+
+  const result =await classesCollections.updateOne(filter,updaterDoc,{upsert:true})
+    res.send(result)
+    console.log(result);
+})
+  
 await client.db("admin").command({ ping: 1 });
 
 console.log("Pinged your deployment. You successfully connected to MongoDB!");
