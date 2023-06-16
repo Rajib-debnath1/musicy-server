@@ -179,6 +179,17 @@ app.get('/allinstructor', async (req, res) => {
   res.status(200).json(getUser)
 
 })
+// app.get('/allinstructor', async (req, res) => {
+//   const query = {
+//     role: "instructor"
+//   }
+
+//   console.log(query, "query in myClass");
+
+//   const getUser = await usersCollections.find(query).toArray();
+//   res.status(200).json(getUser)
+
+// })
 
 app.get('/instructorclass/:email', async (req, res) => {
   const query = {
