@@ -112,6 +112,13 @@ async function run() {
       })
 
 
+      app.get('/addClasses', async(req, res) =>{
+        const query = {} 
+        const result = await classesCollections.find(query).toArray();
+        res.send(result)
+      })
+
+
     
 
     } finally {
