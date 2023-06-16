@@ -24,116 +24,176 @@ const client = new MongoClient(uri, {
   }
 });
 async function run() {
-    try {
-      // Connect the client to the server	(optional starting in v4.7)
-      await client.connect();
-      // Send a ping to confirm a successful connection
-      await client.db("admin").command({ ping: 1 });
-      console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  try {
+    // Connect the client to the server	(optional starting in v4.7)
+    await client.connect();
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
 
-      const usersCollections = client.db("musicyDB").collection("users");
-      const classesCollections = client.db("musicyDB").collection("classes");
+    const usersCollections = client.db("musicyDB").collection("users");
+    const classesCollections = client.db("musicyDB").collection("classes");
+    const selectedCollections = client.db("musicyDB").collection("selected");
 
-// addUsers from firebase
-      app.post("/addUsers", async(req, res)=>{
-        const data = req.body;
-        console.log(data,"data");
-        const getUser = await usersCollections.findOne({email: data.email})
-        if(!getUser?.email){
-            const result = await usersCollections.insertOne(data)
-        if(result){
-            res.send(result)
+    // addUsers from firebase
+    app.post("/addUsers", async (req, res) => {
+      const data = req.body;
+      console.log(data, "data");
+      const getUser = await usersCollections.findOne({ email: data.email })
+      if (!getUser?.email) {
+        const result = await usersCollections.insertOne(data)
+        if (result) {
+          res.send(result)
         }
-        console.log(result,'success'); 
+        console.log(result, 'success');
+      }
+      else {
+        res.send({ error: 'already added user in db' })
+      }
+
+    })
+
+
+    app.get('/allUsers', async (req, res) => {
+      const query = {}
+      const result = await usersCollections.find(query).toArray();
+      res.send(result)
+    })
+
+
+
+
+    app.put('/changeRole', async (req, res) => {
+      const { id, role: newRole } = req.body
+
+      const filter = { _id: new ObjectId(id) }
+
+      // const filter2={email:req.body.email}
+
+      const updaterDoc = {
+        $set: {
+          role: newRole
         }
-         else{
-            res.send({error: 'already added user in db'})
-         }
-       
-      })
+      }
+
+      console.log(filter, 'data');
+      const result = await usersCollections.updateOne(filter, updaterDoc);
+      console.log(result);
+      res.send(result)
+    })
+
+    app.get('/checkRole/:email', async (req, res) => {
+      const query = { email: req.params.email }
+      console.log(query, "query for role");
+      if (req.params.email) {
+        const getUser = await usersCollections.findOne(query);
+
+        res.status(200).json(getUser)
+
+      }
 
 
-      app.get('/allUsers', async(req, res) =>{
-        const query = {} 
-        const result = await usersCollections.find(query).toArray();
-        res.send(result)
-      })
-
-      
+    })
 
 
-      app.put('/changeRole', async(req, res) =>{
-        const {id, role: newRole} = req.body
-
-        const filter = {_id: new ObjectId(id)}
-
-        // const filter2={email:req.body.email}
-
-        const updaterDoc = {
-            $set: {
-                role: newRole
-            }
-        }
-        
-        console.log(filter, 'data');
-        const result = await usersCollections.updateOne(filter,updaterDoc);
-        console.log(result);
-        res.send(result)
-      })
-
-      app.get('/checkRole/:email', async(req, res) =>{
-        const query = {email: req.params.email} 
-        console.log(query,"query");
-        if(req.params.email){
-            const getUser = await usersCollections.findOne(query);
-            
-            res.status(200).json(getUser)
-
-        }
-
-   
-      })
+    app.post("/addClasses", async (req, res) => {
+      const data = req.body;
+      console.log(data, "data");
 
 
-      app.post("/addClasses", async(req, res)=>{
-        const data = req.body;
-        console.log(data,"data");
+      const result = await classesCollections.insertOne(data)
 
-       
-            const result = await classesCollections.insertOne(data)
-        
-            res.send(result)
-        
-        console.log(result,'success'); 
-        
-        
-       
-      })
+      res.send(result)
+
+      console.log(result, 'success');
 
 
-      app.get('/addClasses', async(req, res) =>{
-        const query = {} 
-        const result = await classesCollections.find(query).toArray();
-        res.send(result)
-      })
+
+    })
+
+    app.post("/selectClass", async (req, res) => {
+      const data = req.body;
+      console.log(data, "data");
 
 
+      const result = await selectedCollections.insertOne(data)
+
+      res.send(result)
+
+      console.log(result, 'success');
+
+
+    })
+
+
+    app.get('/addClasses', async (req, res) => {
+      const query = {}
+      const result = await classesCollections.find(query).toArray();
+      res.send(result)
+    })
+
+
+    app.get('/myclass/:email', async (req, res) => {
+      const query = {
+        user: req.params.email
+      }
+
+      console.log(query, "query in myClass");
+
+      if (req.params.email) {
+        const getUser = await selectedCollections.find(query).toArray();
+        res.status(200).json(getUser)
+      }
+
+
+    })
+
+    app.delete('/deleteClass', async (req, res) => {
+      const data = req.body;
+      const name= data?.name;
+      // const query = { _id: new ObjectId(id) };
+      const query = { name:name};
     
+      if (name) {
+        const result = await selectedCollections.deleteOne(query);
+        res.send(result);
+      }
+    
+      console.log(query);
+    });
 
-    } finally {
-      // Ensures that the client will close when you finish/error
-    //   await client.close();
-    }
+// all instrunctor ///
+
+
+app.get('/allinstructor', async (req, res) => {
+  const query = {
+    role: "instructor"
   }
-  run().catch(console.dir);
+
+  console.log(query, "query in myClass");
+
+  const getUser = await usersCollections.find(query).toArray();
+  res.status(200).json(getUser)
+
+})
+
+    a
+
+
+  } finally {
+    // Ensures that the client will close when you finish/error
+    //   await client.close();
+  }
+}
+run().catch(console.dir);
 
 
 
 app.get('/', (req, res) => {
-    res.send(' Musicy is running')
+  res.send(' Musicy is running')
 })
 
 app.listen(port, () => {
-    console.log(`Musicy Server is running on port ${port}`.red.underline.bold)
+  console.log(`Musicy Server is running on port ${port}`.red.underline.bold)
 })
